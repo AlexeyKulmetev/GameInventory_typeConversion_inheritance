@@ -4,6 +4,7 @@
 
 class Weapon : public Item {
 public:
+	// for Virtual Clone pattern
 	Item* clone() const override {
 		return new Weapon(*this);
 	}

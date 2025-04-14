@@ -18,8 +18,34 @@ public:
 			}
 		}
 	}
-	GameManager(GameManager&& other) {
-
+	GameManager(GameManager&& other) noexcept : items(std::move(other.items)) {
+		other.items.clear();
+	}
+	GameManager& operator = (const GameManager& other) {
+		if (&other == this) {
+			return *this;
+		}
+		for (Item* item : items) {
+			delete item;
+		}
+		items.clear();
+		for (const Item* item : other.items) {
+			if (item) {
+				items.push_back(item->clone());
+			}
+		}
+		return *this;
+	}
+	GameManager& operator = (GameManager&& other) noexcept{
+		if (&other == this) {
+			return *this;
+		}
+		for (Item* item : items) {
+			delete item;
+		}
+		items = std::move(other.items);
+		other.items.clear();
+		return *this;
 	}
 	void createItems() {
 		for (int i = 0; i < Constants::ITEMS_NUM; ++i) {
@@ -33,14 +59,6 @@ public:
 				pPotion->setHealingPower(rand() % 31 + 10);
 				items.push_back(pPotion);
 			}
-		}
-	}
-	void useItem(const Item* item) const {
-		if (item) {
-			item->use();
-		}
-		else {
-			std::cout << "Check";
 		}
 	}
 	void useAllItems() const {
